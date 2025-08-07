@@ -138,11 +138,11 @@ st.dataframe(
 # response = get_price_history(selected_id)
 
 # Check if the response has valid price data
-if response["status"] != 200 or "prices" not in response["json"]:
-    st.warning(f"⚠️ CoinGecko returned no price data for {selected_coin}.")
-    st.markdown("### Raw API Response")
-    st.write(response)
-    st.stop()
+#if response["status"] != 200 or "prices" not in response["json"]:
+#    st.warning(f"⚠️ CoinGecko returned no price data for {selected_coin}.")
+#    st.markdown("### Raw API Response")
+#    st.write(response)
+#    st.stop()
 
 # Extract price data
 price_data = response["json"]["prices"]
