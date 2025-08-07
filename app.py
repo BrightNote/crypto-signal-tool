@@ -112,9 +112,12 @@ def get_price_history(coin_id):
 
 # --- Fetch and plot historical data ---
 price_data = get_price_history(selected_id)
-# Preview raw price data
-st.markdown("### Raw Price Data (Debug)")
-st.write(price_data[:5])  # show first 5 points
+
+if not price_data:
+    st.warning(f"No historical price data available for {selected_coin}. Showing raw API response for debug:")
+    url = f"https://api.coingecko.com/api/v3/coins/{selected_id}/market_chart"
+    st.code(f"GET {url}")
+    st.stop()
 
 # Parse into DataFrame
 price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
@@ -136,6 +139,7 @@ fig.update_layout(
     height=400
 )
 st.plotly_chart(fig, use_container_width=True)
+
 
 
 
