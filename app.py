@@ -81,14 +81,11 @@ st.dataframe(
     use_container_width=True
 )
 
-# --- Coin selector + chart ---
-st.markdown("### 📉 View Price Trend")
+# --- Coin selector (chart disabled temporarily) ---
+st.markdown("### 📉 View Price Trend (Coming Soon)")
 selected_coin = st.selectbox("Select a coin to view its 7-day chart:", df["name"])
-selected_data = df[df["name"] == selected_coin].iloc[0]
-sparkline_data = selected_data["sparkline_in_7d"]["price"]
+st.info(f"Chart for {selected_coin} will be added in the next step.")
 
-chart = plot_price_chart(sparkline_data, selected_coin)
-st.plotly_chart(chart, use_container_width=True)
 
 # --- Footer ---
 st.markdown(f"Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
