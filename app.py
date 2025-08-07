@@ -12,7 +12,7 @@ st.subheader("Real-time crypto market snapshot")
 # --- CoinGecko API call ---
 @st.cache_data(ttl=600)
 def get_market_data():
-        st.markdown("### Raw API Response Preview")
+    st.markdown("### Raw API Response Preview")
     st.write(df.head())
 
     url = "https://api.coingecko.com/api/v3/coins/markets"
