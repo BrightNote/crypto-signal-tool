@@ -89,16 +89,17 @@ with st.spinner("Loading market data..."):
 # --- Display Table ---
 st.markdown("### Top 20 Coins with Signals")
 st.dataframe(
-    df[["symbol", "name", "current_price", "price_change_percentage_24h", "Signal"]]
+    df[["symbol", "name", "price", "percent_change_24h", "Signal"]]
     .rename(columns={
         "symbol": "Symbol",
         "name": "Name",
-        "current_price": "Price (USD)",
-        "price_change_percentage_24h": "24h Change (%)",
+        "price": "Price (USD)",
+        "percent_change_24h": "24h Change (%)",
         "Signal": "Signal"
     }),
     use_container_width=True
 )
+
 
 # --- Coin selector + chart ---
 st.markdown("### 📉 View 7-Day Price Trend")
