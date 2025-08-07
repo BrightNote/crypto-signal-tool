@@ -12,6 +12,9 @@ st.subheader("Real-time crypto market snapshot")
 # --- CoinGecko API call ---
 @st.cache_data(ttl=600)
 def get_market_data():
+        st.markdown("### Raw API Response Preview")
+    st.write(df.head())
+
     url = "https://api.coingecko.com/api/v3/coins/markets"
     params = {
         'vs_currency': 'usd',
@@ -55,16 +58,19 @@ def plot_price_chart(sparkline, coin_name):
 with st.spinner("Loading market data..."):
     df = get_market_data()
 
-    # Safely check columns exist before using
-    expected_cols = {"id", "symbol", "name", "current_price", "price_change_percentage_24h", "sparkline_in_7d"}
-    available_cols = set(df.columns)
-
-    if expected_cols.issubset(available_cols):
-        df = df[["id", "symbol", "name", "current_price", "price_change_percentage_24h", "sparkline_in_7d"]]
-        df = add_signal_column(df)
-    else:
-        st.error("⚠️ CoinGecko data returned an unexpected format. Please try again later.")
+    if df.empty or "name" not in df.columns:
+        st.error("⚠️ Failed to load expected coin data from CoinGecko.")
         st.stop()
+
+    # Show preview so we can debug structure
+    st.markdown("### Raw API Response Preview")
+    st.write(df.head())
+
+    # Only use available columns
+    safe_cols = [col for col in ["id", "symbol", "name", "current_price", "price_change_percentage_24h"] if col in df.columns]
+    df = df[safe_cols]
+    df = add_signal_column(df)
+
 
 
 # --- Display Table ---
