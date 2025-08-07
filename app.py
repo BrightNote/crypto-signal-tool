@@ -103,11 +103,10 @@ def get_price_history(coin_id):
         "interval": "hourly"
     }
     response = requests.get(url, params=params)
-    if response.status_code != 200:
-        return None
-
-    data = response.json()
-    return data.get("prices", None)  # return None if prices key is missing
+    return {
+        "status": response.status_code,
+        "json": response.json()
+    }
 
 
 # --- Fetch and plot historical data ---
