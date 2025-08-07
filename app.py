@@ -135,7 +135,7 @@ st.dataframe(
 
 
 # Call the API and get full response
-response = get_price_history(selected_id)
+# response = get_price_history(selected_id)
 
 # Check if the response has valid price data
 if response["status"] != 200 or "prices" not in response["json"]:
