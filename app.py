@@ -54,8 +54,18 @@ def plot_price_chart(sparkline, coin_name):
 # --- Fetch & Process Data ---
 with st.spinner("Loading market data..."):
     df = get_market_data()
-    df = df[["id", "symbol", "name", "current_price", "price_change_percentage_24h", "sparkline_in_7d"]]
-    df = add_signal_column(df)
+
+    # Safely check columns exist before using
+    expected_cols = {"id", "symbol", "name", "current_price", "price_change_percentage_24h", "sparkline_in_7d"}
+    available_cols = set(df.columns)
+
+    if expected_cols.issubset(available_cols):
+        df = df[["id", "symbol", "name", "current_price", "price_change_percentage_24h", "sparkline_in_7d"]]
+        df = add_signal_column(df)
+    else:
+        st.error("⚠️ CoinGecko data returned an unexpected format. Please try again later.")
+        st.stop()
+
 
 # --- Display Table ---
 st.markdown("### Top 20 Coins with Signals")
