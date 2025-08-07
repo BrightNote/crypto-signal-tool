@@ -145,11 +145,11 @@ st.dataframe(
 #    st.stop()
 
 # Extract price data
-price_data = response["json"]["prices"]
+# price_data = response["json"]["prices"]
 
 # Parse into DataFrame
-price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
-price_df["timestamp"] = pd.to_datetime(price_df["timestamp"], unit="ms")
+# price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
+# price_df["timestamp"] = pd.to_datetime(price_df["timestamp"], unit="ms")
 
 # Plot with Plotly
 import plotly.graph_objs as go
