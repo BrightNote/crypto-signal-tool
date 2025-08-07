@@ -101,12 +101,38 @@ st.dataframe(
 )
 
 
-# --- Coin selector + chart ---
-st.markdown("### 📉 View 7-Day Price Trend")
+# --- Coin selector + chart (temporarily disabled) ---
+# selected_coin = st.selectbox("Select a coin to view its 7-day price chart:", df["name"])
+# selected_row = df[df["name"] == selected_coin].iloc[0]
+# selected_id = selected_row["id"]
+# response = get_price_history(selected_id)
 
-selected_coin = st.selectbox("Select a coin to view its 7-day price chart:", df["name"])
-selected_row = df[df["name"] == selected_coin].iloc[0]
-selected_id = selected_row["id"]
+# if response["status"] != 200 or "prices" not in response["json"]:
+#     st.warning(f"⚠️ CoinMarketCap returned no price data for {selected_coin}.")
+#     st.markdown("### Raw API Response")
+#     st.write(response)
+#     st.stop()
+
+# price_data = response["json"]["prices"]
+# price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
+# price_df["timestamp"] = pd.to_datetime(price_df["timestamp"], unit="ms")
+
+# import plotly.graph_objs as go
+# fig = go.Figure()
+# fig.add_trace(go.Scatter(
+#     x=price_df["timestamp"],
+#     y=price_df["price"],
+#     mode='lines',
+#     name='Price'
+# ))
+# fig.update_layout(
+#     title=f"{selected_coin} - 7 Day Price Chart",
+#     xaxis_title="Date",
+#     yaxis_title="Price (USD)",
+#     height=400
+# )
+# st.plotly_chart(fig, use_container_width=True)
+
 
 # Call the API and get full response
 response = get_price_history(selected_id)
