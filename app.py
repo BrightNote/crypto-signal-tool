@@ -41,10 +41,11 @@ def get_market_data():
 
 # --- Signal Logic ---
 def add_signal_column(df):
-    df['Signal'] = df['price_change_percentage_24h'].apply(
+    df['Signal'] = df['percent_change_24h'].apply(
         lambda x: "BUY ✅" if x > 3 else ""
     )
     return df
+
 
 # --- Plot chart ---
 def plot_price_chart(sparkline, coin_name):
