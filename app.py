@@ -11,22 +11,21 @@ st.subheader("Real-time crypto market snapshot")
 
 # --- CoinGecko API call ---
 @st.cache_data(ttl=600)
+@st.cache_data(ttl=600)
 def get_market_data():
-    st.markdown("### Raw API Response Preview")
-    st.write(df.head())
-
     url = "https://api.coingecko.com/api/v3/coins/markets"
     params = {
         'vs_currency': 'usd',
         'order': 'market_cap_desc',
         'per_page': 20,
         'page': 1,
-        'sparkline': 'true',  # enable sparkline data
+        'sparkline': 'false',
         'price_change_percentage': '1h,24h'
     }
     response = requests.get(url, params=params)
     data = response.json()
     return pd.DataFrame(data)
+
 
 # --- Signal Logic ---
 def add_signal_column(df):
