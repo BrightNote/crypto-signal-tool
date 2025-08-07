@@ -112,6 +112,9 @@ def get_price_history(coin_id):
 
 # --- Fetch and plot historical data ---
 price_data = get_price_history(selected_id)
+# Preview raw price data
+st.markdown("### Raw Price Data (Debug)")
+st.write(price_data[:5])  # show first 5 points
 
 # Parse into DataFrame
 price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
