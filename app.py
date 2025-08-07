@@ -94,19 +94,40 @@ selected_coin = st.selectbox("Select a coin to view its 7-day price chart:", df[
 selected_row = df[df["name"] == selected_coin].iloc[0]
 selected_id = selected_row["id"]
 
-@st.cache_data(ttl=600)
-def get_price_history(coin_id):
-    url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
-    params = {
-        "vs_currency": "usd",
-        "days": 7,
-        "interval": "hourly"
-    }
-    response = requests.get(url, params=params)
-    return {
-        "status": response.status_code,
-        "json": response.json()
-    }
+# Call the API and get full response
+response = get_price_history(selected_id)
+
+# Check if the response has valid price data
+if response["status"] != 200 or "prices" not in response["json"]:
+    st.warning(f"⚠️ CoinGecko returned no price data for {selected_coin}.")
+    st.markdown("### Raw API Response")
+    st.write(response)
+    st.stop()
+
+# Extract price data
+price_data = response["json"]["prices"]
+
+# Parse into DataFrame
+price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
+price_df["timestamp"] = pd.to_datetime(price_df["timestamp"], unit="ms")
+
+# Plot with Plotly
+import plotly.graph_objs as go
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=price_df["timestamp"],
+    y=price_df["price"],
+    mode='lines',
+    name='Price'
+))
+fig.update_layout(
+    title=f"{selected_coin} - 7 Day Price Chart",
+    xaxis_title="Date",
+    yaxis_title="Price (USD)",
+    height=400
+)
+st.plotly_chart(fig, use_container_width=True)
+
 
 
 # --- Fetch and plot historical data ---
