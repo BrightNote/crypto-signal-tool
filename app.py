@@ -9,7 +9,7 @@ st.title("📈 Crypto Signal Dashboard")
 st.subheader("Real-time crypto market snapshot")
 
 # --- CoinGecko API call ---
-@st.cache_data(ttl=600)  # Cache for 10 minutes
+@st.cache_data(ttl=600)
 def get_market_data():
     url = "https://api.coingecko.com/api/v3/coins/markets"
     params = {
@@ -24,19 +24,28 @@ def get_market_data():
     data = response.json()
     return pd.DataFrame(data)
 
-# --- Fetch data ---
+# --- Signal Logic ---
+def add_signal_column(df):
+    df['Signal'] = df['price_change_percentage_24h'].apply(
+        lambda x: "BUY ✅" if x > 3 else ""
+    )
+    return df
+
+# --- Fetch & Process Data ---
 with st.spinner("Loading market data..."):
     df = get_market_data()
+    df = df[["symbol", "name", "current_price", "price_change_percentage_24h"]]
+    df = add_signal_column(df)
 
-# --- Display table ---
-st.markdown("### Top 20 Coins")
+# --- Display Table ---
+st.markdown("### Top 20 Coins with Signals")
 st.dataframe(
-    df[["symbol", "name", "current_price", "price_change_percentage_24h"]]
-    .rename(columns={
+    df.rename(columns={
         "symbol": "Symbol",
         "name": "Name",
         "current_price": "Price (USD)",
-        "price_change_percentage_24h": "24h Change (%)"
+        "price_change_percentage_24h": "24h Change (%)",
+        "Signal": "Signal"
     }),
     use_container_width=True
 )
