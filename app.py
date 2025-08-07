@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
 import pandas as pd
-from datetime import datetime
+import plotly.graph_objs as go
+from datetime import datetime, timedelta
 
 st.set_page_config(page_title="Crypto Signal Tool", layout="wide")
 
@@ -17,7 +18,7 @@ def get_market_data():
         'order': 'market_cap_desc',
         'per_page': 20,
         'page': 1,
-        'sparkline': 'false',
+        'sparkline': 'true',  # enable sparkline data
         'price_change_percentage': '1h,24h'
     }
     response = requests.get(url, params=params)
@@ -31,16 +32,36 @@ def add_signal_column(df):
     )
     return df
 
+# --- Plot chart ---
+def plot_price_chart(sparkline, coin_name):
+    days = 7
+    timestamps = [datetime.utcnow() - timedelta(hours=(168 - i)) for i in range(len(sparkline))]
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=timestamps,
+        y=sparkline,
+        mode='lines',
+        name='Price'
+    ))
+    fig.update_layout(
+        title=f"{coin_name} - 7 Day Price Trend",
+        xaxis_title="Date",
+        yaxis_title="Price (USD)",
+        height=400
+    )
+    return fig
+
 # --- Fetch & Process Data ---
 with st.spinner("Loading market data..."):
     df = get_market_data()
-    df = df[["symbol", "name", "current_price", "price_change_percentage_24h"]]
+    df = df[["id", "symbol", "name", "current_price", "price_change_percentage_24h", "sparkline_in_7d"]]
     df = add_signal_column(df)
 
 # --- Display Table ---
 st.markdown("### Top 20 Coins with Signals")
 st.dataframe(
-    df.rename(columns={
+    df[["symbol", "name", "current_price", "price_change_percentage_24h", "Signal"]]
+    .rename(columns={
         "symbol": "Symbol",
         "name": "Name",
         "current_price": "Price (USD)",
@@ -49,6 +70,15 @@ st.dataframe(
     }),
     use_container_width=True
 )
+
+# --- Coin selector + chart ---
+st.markdown("### 📉 View Price Trend")
+selected_coin = st.selectbox("Select a coin to view its 7-day chart:", df["name"])
+selected_data = df[df["name"] == selected_coin].iloc[0]
+sparkline_data = selected_data["sparkline_in_7d"]["price"]
+
+chart = plot_price_chart(sparkline_data, selected_coin)
+st.plotly_chart(chart, use_container_width=True)
 
 # --- Footer ---
 st.markdown(f"Last updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
