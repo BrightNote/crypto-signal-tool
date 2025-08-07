@@ -73,6 +73,7 @@ with st.spinner("Loading market data..."):
 
 
 
+
 # --- Display Table ---
 st.markdown("### Top 20 Coins with Signals")
 st.dataframe(
