@@ -9,22 +9,34 @@ st.set_page_config(page_title="Crypto Signal Tool", layout="wide")
 st.title("📈 Crypto Signal Dashboard")
 st.subheader("Real-time crypto market snapshot")
 
-# --- CoinGecko API call ---
-@st.cache_data(ttl=600)
 @st.cache_data(ttl=600)
 def get_market_data():
-    url = "https://api.coingecko.com/api/v3/coins/markets"
-    params = {
-        'vs_currency': 'usd',
-        'order': 'market_cap_desc',
-        'per_page': 20,
-        'page': 1,
-        'sparkline': 'false',
-        'price_change_percentage': '1h,24h'
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
+    headers = {
+        "Accepts": "application/json",
+        "X-CMC_PRO_API_KEY": "296ec5c4-43e0-4a6b-9d69-0b3dab8dd8a5"
     }
-    response = requests.get(url, params=params)
+    params = {
+        "start": "1",
+        "limit": "20",
+        "convert": "USD"
+    }
+
+    response = requests.get(url, headers=headers, params=params)
     data = response.json()
-    return pd.DataFrame(data)
+
+    # Flatten and build dataframe
+    coins = []
+    for coin in data.get("data", []):
+        coins.append({
+            "id": coin["id"],
+            "name": coin["name"],
+            "symbol": coin["symbol"],
+            "price": coin["quote"]["USD"]["price"],
+            "percent_change_24h": coin["quote"]["USD"]["percent_change_24h"]
+        })
+    return pd.DataFrame(coins)
+
 
 
 # --- Signal Logic ---
