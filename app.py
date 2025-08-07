@@ -56,6 +56,22 @@ with st.spinner("Loading market data..."):
 
     df = df[["symbol", "name", "price", "percent_change_24h"]]
     df = add_signal_column(df)
+from datetime import datetime
+import os
+
+# --- Log today's BUY signals to a CSV file ---
+buy_signals = df[df["Signal"] == "BUY ✅"]
+if not buy_signals.empty:
+    log_folder = "data"
+    os.makedirs(log_folder, exist_ok=True)
+    log_file = os.path.join(log_folder, "signals.csv")
+
+    buy_signals["date"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    buy_signals[["date", "symbol", "name", "price", "percent_change_24h"]].to_csv(
+        log_file, mode='a', header=not os.path.exists(log_file), index=False
+    )
+
+    st.success(f"📥 {len(buy_signals)} signal(s) logged to signals.csv")
 
     st.markdown("### Top 20 Coins")
     st.dataframe(
