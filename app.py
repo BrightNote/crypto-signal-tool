@@ -87,10 +87,49 @@ st.dataframe(
     use_container_width=True
 )
 
-# --- Coin selector (chart disabled temporarily) ---
-st.markdown("### 📉 View Price Trend (Coming Soon)")
-selected_coin = st.selectbox("Select a coin to view its 7-day chart:", df["name"])
-st.info(f"Chart for {selected_coin} will be added in the next step.")
+# --- Coin selector + chart ---
+st.markdown("### 📉 View 7-Day Price Trend")
+
+selected_coin = st.selectbox("Select a coin to view its 7-day price chart:", df["name"])
+selected_row = df[df["name"] == selected_coin].iloc[0]
+selected_id = selected_row["id"]
+
+@st.cache_data(ttl=600)
+def get_price_history(coin_id):
+    url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart"
+    params = {
+        "vs_currency": "usd",
+        "days": 7,
+        "interval": "hourly"
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    return data["prices"]  # list of [timestamp, price]
+
+# --- Fetch and plot historical data ---
+price_data = get_price_history(selected_id)
+
+# Parse into DataFrame
+price_df = pd.DataFrame(price_data, columns=["timestamp", "price"])
+price_df["timestamp"] = pd.to_datetime(price_df["timestamp"], unit="ms")
+
+# Plot with Plotly
+import plotly.graph_objs as go
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=price_df["timestamp"],
+    y=price_df["price"],
+    mode='lines',
+    name='Price'
+))
+fig.update_layout(
+    title=f"{selected_coin} - 7 Day Price Chart",
+    xaxis_title="Date",
+    yaxis_title="Price (USD)",
+    height=400
+)
+st.plotly_chart(fig, use_container_width=True)
+
 
 
 # --- Footer ---
