@@ -80,11 +80,9 @@ with st.spinner("Loading market data..."):
     st.write(df.head())
 
     # Safe column filtering
-    safe_cols = [col for col in ["id", "symbol", "name", "current_price", "price_change_percentage_24h"] if col in df.columns]
-    df = df[safe_cols]
+    safe_cols = [col for col in ["id", "symbol", "name", "price", "percent_change_24h"] if col in df.columns]
+df = df[safe_cols]
     df = add_signal_column(df)
-
-
 
 
 
